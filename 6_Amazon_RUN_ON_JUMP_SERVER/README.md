@@ -2,7 +2,7 @@
 Deploy Steps
 -------------------------
 
-
+RUN ALL COMMAND ON JUMP SERVER
 
 ****************************************
 Step 1 — LBC Policy File Download
