@@ -8,7 +8,7 @@ AWS Console → EC2 → Launch instance (Ubuntu 22)
 ****************************************
 
 
-==========================================================
+======================================================================================
 Name:  bastion-tools-server
 AMI:  Ubuntu Server 22.04 LTS (Free tier eligible)
 Instance type: t3.small
