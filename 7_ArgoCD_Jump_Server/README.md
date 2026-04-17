@@ -1,46 +1,70 @@
 -------------------------
-Amazon IAM → Create Role
+Run On Jump Server
 -------------------------
 
+ssh -i bastion-key.pem ubuntu@<JUMP_SERVER_IP>
 
-Create four IAM Roles
 
-****************************************
-Role 1: bastion-ec2-role (Tools server)
-****************************************
+EKS cluster connect verify
 
-Console → IAM → Roles → Create role
-→Trusted entity type:  AWS Service → (Use case)EC2
-→Policies attach (search): AdministratorAccess
-→Create role → Name: bastion-ec2-role
+-----------------------------------------------------------------------------
+kubectl get nodes
+-----------------------------------------------------------------------------
+
+*******************************************
+Install via Helm
+*******************************************
+
+====================================================================================
+
+kubectl create namespace argocd
+
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+
+helm install argocd argo/argo-cd \
+  --namespace argocd \
+  --set server.service.type=LoadBalancer
+
+# Wait for pods
+kubectl get pods -n argocd -w
+
 ====================================================================================
 
 ********************************************
-Role 2: eks-cluster-role (EKS Control Plane)
+Get Password & URL
 ********************************************
 
 
-Console → IAM → Roles → Create role
-→Trusted entity:  AWS Service → EKS → EKS - Cluster
-→Policies attach (search): Policy: AmazonEKSClusterPolicy
-→Create role → Name: eks-cluster-role
+# Password
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d
+
+# URL (EXTERNAL-IP copy karo)
+kubectl get svc -n argocd argocd-server
+
 =======================================================================================
 ************************************
-Role 3: eks-node-role (Worker Nodes)
+ArgoCD CLI + GitHub Connect
 ************************************
+# CLI Install
+curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x argocd && sudo mv argocd /usr/local/bin
 
-Console → IAM → Roles → Create role
-→Trusted entity:  AWS Service → EC2
-→Policies: AmazonEKSWorkerNodePolicy, AmazonEKS_CNI_Policy →AmazonEC2ContainerRegistryReadOnly
-     Name: eks-node-role
+# Login
+argocd login <ARGOCD-EXTERNAL-IP> --username admin --password <password> --insecure
+
+# GitHub Repo Connect
+argocd repo add https://github.com/your-org/your-repo \
+  --username your-github-user \
+  --password your-github-token
+
+# App Create
+argocd app create gsv-app \
+  --repo https://github.com/your-org/your-repo \
+  --path helm/gsv-app \
+  --dest-server https://kubernetes.default.svc \
+  --dest-namespace default \
+  --sync-policy automated
+
 =============================================================================================
-***********************************
-Role 4: github-actions-role (CI/CD)
-***********************************
-
-
-Console → IAM → Roles → Create role
-→Trusted entity:  AWS Service → EC2
-→Policies: AmazonEC2ContainerRegistryFullAccess, AmazonEKSClusterPolicy
-    Name: github-actions-role
-================================================================================================
