@@ -1,0 +1,29 @@
+resource "random_id" "rand" { byte_length = 4 }
+
+resource "aws_s3_bucket" "app_uploads" {
+  bucket = "${var.project_name}-uploads-${random_id.rand.hex}"
+  tags   = { Name = "${var.project_name}-uploads" }
+}
+
+resource "aws_s3_bucket_public_access_block" "uploads_access" {
+  bucket                  = aws_s3_bucket.app_uploads.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "uploads_versioning" {
+  bucket = aws_s3_bucket.app_uploads.id
+  versioning_configuration { status = "Enabled" }
+}
+
+resource "aws_s3_bucket_cors_configuration" "uploads_cors" {
+  bucket = aws_s3_bucket.app_uploads.id
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST", "DELETE"]
+    allowed_origins = ["*"]
+    max_age_seconds = 3000
+  }
+}

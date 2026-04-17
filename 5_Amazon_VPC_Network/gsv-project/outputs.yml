@@ -1,0 +1,11 @@
+output "vpc_id"              { value = aws_vpc.main.id }
+output "public_subnets"      { value = [aws_subnet.public_az1.id, aws_subnet.public_az2.id] }
+output "private_subnets"     { value = [aws_subnet.private_az1.id, aws_subnet.private_az2.id] }
+output "nat_gateway_ips"     { value = [aws_eip.nat1.public_ip, aws_eip.nat2.public_ip] }
+output "ecr_repo_url"        { value = aws_ecr_repository.app.repository_url }
+output "s3_bucket_name"      { value = aws_s3_bucket.app_uploads.bucket }
+output "rds_endpoint"        { value = aws_rds_cluster.aurora.endpoint }
+output "eks_cluster_name"    { value = aws_eks_cluster.main.name }
+output "eks_cluster_endpoint"{ value = aws_eks_cluster.main.endpoint }
+output "lbc_role_arn"        { value = aws_iam_role.lbc_role.arn }
+output "app_s3_role_arn"     { value = aws_iam_role.app_s3_role.arn }

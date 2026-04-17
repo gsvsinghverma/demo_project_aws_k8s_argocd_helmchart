@@ -1,0 +1,34 @@
+# LBC Policy (file download karni hogi — niche command hai)
+resource "aws_iam_policy" "lbc_policy" {
+  name   = "${var.project_name}-lbc-policy"
+  policy = file("lbc-policy.json")
+}
+
+# OIDC Provider
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+# LBC IAM Role
+resource "aws_iam_role" "lbc_role" {
+  name = "${var.project_name}-lbc-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Federated = aws_iam_openid_connect_provider.eks.arn }
+      Action    = "sts:AssumeRoleWithWebIdentity"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lbc_policy_attach" {
+  role       = aws_iam_role.lbc_role.name
+  policy_arn = aws_iam_policy.lbc_policy.arn
+}
