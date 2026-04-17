@@ -30,17 +30,29 @@ Folder Structure
 
 ********************************************
 ├── main.tf
+
 ├── variables.tf
+
 ├── outputs.tf
+
 ├── terraform.tfvars
+
 ├── s3.tf
+
 ├── ecr.tf
+
 ├── rds.tf
+
 ├── security.tf
+
 ├── iam.tf
+
 ├── alb.tf
+
 ├── eks.tf
+
 ├── generate-env.sh
+
 └── .gitignore
 
 
