@@ -15,7 +15,7 @@ kubectl get nodes
 Install via Helm
 *******************************************
 
-====================================================================================
+
 
 kubectl create namespace argocd
 
@@ -29,7 +29,7 @@ helm install argocd argo/argo-cd \
 # Wait for pods
 kubectl get pods -n argocd -w
 
-====================================================================================
+
 
 ********************************************
 Get Password & URL
@@ -43,7 +43,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 # URL (EXTERNAL-IP copy karo)
 kubectl get svc -n argocd argocd-server
 
-=======================================================================================
+
 ************************************
 ArgoCD CLI + GitHub Connect
 ************************************
@@ -67,4 +67,4 @@ argocd app create gsv-app \
   --dest-namespace default \
   --sync-policy automated
 
-=============================================================================================
+
