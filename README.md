@@ -1,4 +1,4 @@
-# 🚀 GSV Project – Production Ready AWS Infrastructure
+# Project – Production Ready AWS Infrastructure
 
 ## 📌 Overview
 
@@ -12,18 +12,29 @@ It includes a complete environment with:
 * Container Registry (ECR)
 * CI/CD (GitHub Actions + ArgoCD)
 * Load Balancing (AWS Load Balancer Controller)
-
+* cloudwatch (Logs)
+* secrets-manager (Credentails)
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
-Developer → GitHub → GitHub Actions (CI)
-        → Docker Build → Push to ECR
-        → ArgoCD (GitOps CD)
-        → Deploy to EKS
-        → AWS Load Balancer Controller → ALB
-        → Route53 → CloudFront → Users
+Mumbai Region (ap-south-1)
+├── VPC: 10.0.0.0/16
+│   ├── AZ-1a
+│   │   ├── Public Subnet (10.0.1.0/24) → Jump Server
+│   │   ├── Private Subnet (10.0.3.0/24) → EKS Nodes
+│   │   └── DB Subnet (10.0.5.0/24) → RDS
+│   └── AZ-1b
+│       ├── Public Subnet (10.0.2.0/24)
+│       ├── Private Subnet (10.0.4.0/24) → EKS Nodes
+│       └── DB Subnet (10.0.6.0/24) → RDS
+├── EKS Cluster
+├── ECR (Docker Registry)
+├── S3 Bucket
+├── RDS PostgreSQL (Multi-AZ)
+├── CloudWatch
+└── Secrets Manager
 ```
 
 ---
@@ -51,20 +62,48 @@ Developer → GitHub → GitHub Actions (CI)
 ## 📁 Project Structure
 
 ```
-gsv-project/
+~/infrastructure/
+├── providers.tf
 ├── main.tf
 ├── variables.tf
 ├── outputs.tf
-├── terraform.tfvars   (ignored)
-├── s3.tf
-├── ecr.tf
-├── rds.tf
-├── security.tf
-├── iam.tf
-├── alb.tf
-├── eks.tf
-├── generate-env.sh
-└── .gitignore
+├── terraform.tfvars
+├── vpc/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── security-groups/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── iam/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── s3/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── ecr/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── rds/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── eks/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── secrets-manager/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+└── cloudwatch/
+    ├── main.tf
+    ├── variables.tf
+    └── outputs.tf
 ```
 
 ---
